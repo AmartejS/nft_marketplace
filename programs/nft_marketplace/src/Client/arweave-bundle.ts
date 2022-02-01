@@ -22,11 +22,11 @@ import {
 import path from 'path';
 
 import Bundlr from '@bundlr-network/client';
-import BundlrTransaction from '@bundlr-network/client/build/src/transaction';
+import BundlrTransaction from '@bundlr-network/client/build/common/transaction';
 import { Keypair } from '@solana/web3.js';
 
-import { AssetKey } from './types';
 import { StorageType } from './storagetype';
+import { AssetKey } from './types';
 import { sleep } from './various';
 
 export const LAMPORTS = 1_000_000_000;
@@ -330,9 +330,9 @@ async function processFiles({
 }: ProcessFileArgs) {
   const contentType = getType(filePair.image);
   const imageBuffer = await readFile(filePair.image);
-  let imageDataItem: BundlrTransaction | DataItem;
-  let manifestDataItem: BundlrTransaction | DataItem;
-  let arweavePathManifestDataItem: BundlrTransaction | DataItem;
+  let imageDataItem: any;
+  let manifestDataItem: any;
+  let arweavePathManifestDataItem: any;
 
   if (storageType === StorageType.ArweaveSol) {
     imageDataItem = bundlr.createTransaction(imageBuffer, {

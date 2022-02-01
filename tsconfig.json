@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es2019",
     "module": "commonjs",
+    "moduleResolution": "node",
     "outDir": "./../build",
     "declaration": false,
     "esModuleInterop": true,
@@ -15,9 +16,11 @@
     "preserveConstEnums": true,
     "suppressImplicitAnyIndexErrors": true,
     "resolveJsonModule": true,
+    "typeRoots":["types", "node_modules/@types"],
     "lib": ["dom", "es2019"],
     "types": ["jest", "node", "webgl2", "offscreencanvas"]
   },
+  "include": ["programs/nft_marketplace/src/**/*.ts"],
   "exclude": ["node_modules", "typings/browser", "typings/browser.d.ts"],
   "atom": {
     "rewriteTsconfig": false
