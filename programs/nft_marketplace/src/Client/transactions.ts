@@ -1,3 +1,5 @@
+import log from 'loglevel';
+
 import {
   Blockhash,
   Commitment,
@@ -34,11 +36,14 @@ interface BlockhashAndFeeCalculator {
     beforeSend?: () => void,
   ) => {
     const transaction = new Transaction();
+    instructions.forEach(  instruction2=>  log.info('Instructions :', instruction2.data)
+    );
+    log.info('Instructions :', instructions);
     instructions.forEach(instruction => transaction.add(instruction));
     transaction.recentBlockhash = (
       block || (await connection.getRecentBlockhash(commitment))
     ).blockhash;
-  
+  log.info('transaction recentBlockhash: ', transaction);
     if (includesFeePayer) {
       transaction.setSigners(...signers.map(s => s.publicKey));
     } else {
@@ -58,7 +63,7 @@ interface BlockhashAndFeeCalculator {
     if (beforeSend) {
       beforeSend();
     }
-  
+  log.info('sending signedTransaction', transaction);
     const { txid, slot } = await sendSignedTransaction({
       connection,
       signedTransaction: transaction,
@@ -66,7 +71,7 @@ interface BlockhashAndFeeCalculator {
   
     return { txid, slot };
   };
-
+ log.info('sending second signedTransaction')
   export async function sendSignedTransaction({
     signedTransaction,
     connection,
@@ -89,7 +94,7 @@ interface BlockhashAndFeeCalculator {
       },
     );
   
-  //  log.debug('Started awaiting confirmation for', txid);
+    log.debug('Started awaiting confirmation for', txid);
   
     let done = false;
     (async () => {
@@ -113,13 +118,13 @@ interface BlockhashAndFeeCalculator {
         throw new Error('Timed out awaiting confirmation on transaction');
   
       if (confirmation.err) {
-       // log.error(confirmation.err);
+        log.error(confirmation.err);
         throw new Error('Transaction failed: Custom instruction error');
       }
   
       slot = confirmation?.slot || 0;
     } catch (err) {
-     // log.error('Timeout Error caught', err);
+      log.error('Timeout Error caught', err);
       if (err.timeout) {
         throw new Error('Timed out awaiting confirmation on transaction');
       }
@@ -129,12 +134,13 @@ interface BlockhashAndFeeCalculator {
           await simulateTransaction(connection, signedTransaction, 'single')
         ).value;
       } catch (e) {
-      //  log.error('Simulate Transaction error', e);
+        log.error('Simulate Transaction error', e);
       }
       if (simulateResult && simulateResult.err) {
         if (simulateResult.logs) {
           for (let i = simulateResult.logs.length - 1; i >= 0; --i) {
             const line = simulateResult.logs[i];
+            log.info('simulate result: ', line);
             if (line.startsWith('Program log: ')) {
               throw new Error(
                 'Transaction failed: ' + line.slice('Program log: '.length),
@@ -144,13 +150,13 @@ interface BlockhashAndFeeCalculator {
         }
         throw new Error(JSON.stringify(simulateResult.err));
       }
-     // log.error('Got this far.');
-      // throw new Error('Transaction failed');
+      log.error('Got this far.');
+      throw new Error('Transaction failed');
     } finally {
       done = true;
     }
   
-   // log.debug('Latency (ms)', txid, getUnixTs() - startTime);
+    log.debug('Latency (ms)', txid, getUnixTs() - startTime);
     return { txid, slot };
   }
   async function simulateTransaction(
@@ -163,19 +169,21 @@ interface BlockhashAndFeeCalculator {
       // @ts-ignore
       connection._disableBlockhashCaching,
     );
-  
+  log.info('transaction.recentblockhash: ', transaction);
     const signData = transaction.serializeMessage();
     // @ts-ignore
     const wireTransaction = transaction._serialize(signData);
     const encodedTransaction = wireTransaction.toString('base64');
     const config: any = { encoding: 'base64', commitment };
     const args = [encodedTransaction, config];
-  
+  log.info('args: ', args);
     // @ts-ignore
     const res = await connection._rpcRequest('simulateTransaction', args);
+    log.info('res', res.result);
     if (res.error) {
       throw new Error('failed to simulate transaction: ' + res.error.message);
     }
+    log.info('function complete');
     return res.result;
   }
   
@@ -200,7 +208,7 @@ interface BlockhashAndFeeCalculator {
           return;
         }
         done = true;
-       // log.warn('Rejecting for timeout...');
+        log.warn('Rejecting for timeout...');
         reject({ timeout: true });
       }, timeout);
       try {
@@ -214,10 +222,10 @@ interface BlockhashAndFeeCalculator {
               confirmations: 0,
             };
             if (result.err) {
-         //     log.warn('Rejected via websocket', result.err);
+            log.warn('Rejected via websocket', result.err);
               reject(status);
             } else {
-            //  log.debug('Resolved via websocket', result);
+            log.debug('Resolved via websocket', result);
               resolve(status);
             }
           },
@@ -225,7 +233,7 @@ interface BlockhashAndFeeCalculator {
         );
       } catch (e) {
         done = true;
-     //   log.error('WS error in setup', txid, e);
+     log.error('WS error in setup', txid, e);
       }
       while (!done && queryStatus) {
         // eslint-disable-next-line no-loop-func
@@ -237,22 +245,22 @@ interface BlockhashAndFeeCalculator {
             status = signatureStatuses && signatureStatuses.value[0];
             if (!done) {
               if (!status) {
-              //  log.debug('REST null result for', txid, status);
+                log.debug('REST null result for', txid, status);
               } else if (status.err) {
-               // log.error('REST error for', txid, status);
+                log.error('REST error for', txid, status);
                 done = true;
                 reject(status.err);
               } else if (!status.confirmations) {
-               // log.debug('REST no confirmations for', txid, status);
+               log.debug('REST no confirmations for', txid, status);
               } else {
-               // log.debug('REST confirmation for', txid, status);
+               log.debug('REST confirmation for', txid, status);
                 done = true;
                 resolve(status);
               }
             }
           } catch (e) {
             if (!done) {
-             // log.error('REST connection error: txid', txid, e);
+              log.error('REST connection error: txid', txid, e);
             }
           }
         })();
@@ -264,6 +272,6 @@ interface BlockhashAndFeeCalculator {
     if (connection._signatureSubscriptions[subId])
       connection.removeSignatureListener(subId);
     done = true;
-   // log.debug('Returning status', status);
+    log.debug('Returning status', status);
     return status;
   }

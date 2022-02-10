@@ -1,4 +1,5 @@
 import fs from 'fs';
+import log from 'loglevel';
 import path from 'path';
 
 import { CACHE_PATH } from './constants';
@@ -10,6 +11,7 @@ export function cachePath(
   legacy: boolean = false,
 ) {
   const filename = `${env}-${cacheName}`;
+  log.info('filename', filename);
   return path.join(cPath, legacy ? filename : `${filename}.json`);
 }
 

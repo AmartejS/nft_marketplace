@@ -24,17 +24,17 @@ export const CANDY_MACHINE_PROGRAM_ID = new PublicKey(
 );
 
 export const CANDY_MACHINE_PROGRAM_V2_ID = new PublicKey(
-  'cndy3Z4yapfJBmL3ShUp5exZKqR3z33thTzeNMm2gRZ',
-  //'Ch3qpQYqr7AvLP6Eph9xxbtneAbzovzuEexAGh48URHS',
+  //'cndy3Z4yapfJBmL3ShUp5exZKqR3z33thTzeNMm2gRZ',
+  'FkQ2ShnRS7gmSDZVeC4XffFMeCefBwuiSNqPcQcCgT56',
 );
 export const TOKEN_METADATA_PROGRAM_ID = new PublicKey(
-  'ALK4gyYT6HLh2sdUoLpiWHiuz2MSAKs6BxfxQK5iz1FA',
+  'H7qKShe2eg4niUWXxmqWsMZYvWm5LhbVgSo1JaVszj94',
 );
 export const SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID = new PublicKey(
   'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL',
 );
 export const TOKEN_PROGRAM_ID = new PublicKey(
-  '7KsmEc84MY9MZEswt3jr3C51GTqxfLbnCuChgYUgEvJ5',
+  'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
 );
 export const FAIR_LAUNCH_PROGRAM_ID = new PublicKey(
   'faircnAB9k59Y4TXmLabBULeuTLgV7TkGMGNkjnA15j',

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { readFile } from 'fs/promises';
-//import log from 'loglevel';
+import log from 'loglevel';
 import path from 'path';
 
 import {
@@ -95,7 +95,7 @@ export async function uploadV2({
   let uploadSuccessful = true;
   const savedContent = loadCache(cacheName, env);
   const cacheContent = savedContent || {};
-
+ log.info('saved content', savedContent);
   if (!cacheContent.program) {
     cacheContent.program = {};
   }
@@ -111,7 +111,7 @@ export async function uploadV2({
   let candyMachine = cacheContent.program.candyMachine
     ? new PublicKey(cacheContent.program.candyMachine)
     : undefined;
-
+log.info('dirmame :', dirname);
   if (!cacheContent.program.uuid) {
     const firstAssetManifest = getAssetManifest(dirname, '0.json');
 
@@ -137,7 +137,7 @@ export async function uploadV2({
       }
 
       // initialize candy
-     // log.info(`initializing candy machine`);
+     log.info(`initializing candy machine`);
       const res = await createCandyMachineV2(
         anchorProgram,
         walletKeyPair,
@@ -170,22 +170,22 @@ export async function uploadV2({
       cacheContent.program.candyMachine = res.candyMachine.toBase58();
       candyMachine = res.candyMachine;
 
-      // log.info(
-      //   `initialized config for a candy machine with publickey: ${res.candyMachine.toBase58()}`,
-      // );
+     log.info(
+         `initialized config for a candy machine with publickey: ${res.candyMachine.toBase58()}`,
+       );
 
       saveCache(cacheName, env, cacheContent);
     } catch (exx) {
-      //log.error('Error deploying config to Solana network.', exx);
+      log.error('Error deploying config to Solana network.', exx);
       throw exx;
     }
   } else {
-    // log.info(
-    //   `config for a candy machine with publickey: ${cacheContent.program.candyMachine} has been already initialized`,
-    // );
+    log.info(
+      `config for a candy machine with publickey: ${cacheContent.program.candyMachine} has been already initialized`,
+    );
   }
 
-  console.log('Uploading Size', SIZE, dedupedAssetKeys[0]);
+  log.info('Uploading Size', SIZE, dedupedAssetKeys[0]);
 
   if (dedupedAssetKeys.length) {
     if (
@@ -217,10 +217,10 @@ export async function uploadV2({
           updatedManifests,
         );
         saveCache(cacheName, env, cacheContent);
-       // log.info('Saved bundle upload result to cache.');
+       log.info('Saved bundle upload result to cache.');
         result = arweaveBundleUploadGenerator.next();
       }
-     // log.info('Upload done.');
+     log.info('Upload done.');
     } else {
       let lastPrinted = 0;
       const tick = SIZE / 100; //print every one percent
@@ -247,7 +247,7 @@ export async function uploadV2({
                 allIndexesInSlice[i] === 0
               ) {
                 lastPrinted = allIndexesInSlice[i];
-               // log.info(`Processing asset: ${allIndexesInSlice[i]}`);
+               log.info(`Processing asset: ${allIndexesInSlice[i]}`);
               }
 
               let link, imageLink;
@@ -287,7 +287,7 @@ export async function uploadV2({
                     );
                 }
                 if (link && imageLink) {
-                 // log.debug('Updating cache for ', allIndexesInSlice[i]);
+                  log.debug('Updating cache for ', allIndexesInSlice[i]);
                   cacheContent.items[assetKey.index] = {
                     link,
                     name: manifest.name,
@@ -296,7 +296,7 @@ export async function uploadV2({
                   saveCache(cacheName, env, cacheContent);
                 }
               } catch (err) {
-              //   log.error(`Error uploading file ${assetKey}`, err);
+                log.error(`Error uploading file ${assetKey}`, err);
                  i--;
              }
             }
@@ -327,9 +327,9 @@ export async function uploadV2({
               const ind = keys[indexes[0]];
 
               if (onChain.length != indexes.length) {
-                // log.info(
-                //   `Writing indices ${ind}-${keys[indexes[indexes.length - 1]]}`,
-                // );
+                log.info(
+                  `Writing indices ${ind}-${keys[indexes[indexes.length - 1]]}`,
+                );
                 try {
                   await anchorProgram.rpc.addConfigLines(
                     ind,
@@ -354,12 +354,12 @@ export async function uploadV2({
                   });
                   saveCache(cacheName, env, cacheContent);
                 } catch (e) {
-                  // log.error(
-                  //   `saving config line ${ind}-${
-                  //     keys[indexes[indexes.length - 1]]
-                  //   } failed`,
-                  //   e,
-                  // );
+                  log.error(
+                    `saving config line ${ind}-${
+                      keys[indexes[indexes.length - 1]]
+                    } failed`,
+                    e,
+                  );
                   uploadSuccessful = false;
                 }
               }
@@ -368,12 +368,12 @@ export async function uploadV2({
         ),
       );
     } catch (e) {
-   //   log.error(e);
+     log.error(e);
     } finally {
       saveCache(cacheName, env, cacheContent);
     }
   } else {
-  //  log.info('Skipping upload to chain as this is a hidden Candy Machine');
+    log.info('Skipping upload to chain as this is a hidden Candy Machine');
   }
 
   console.log(`Done. Successful = ${uploadSuccessful}.`);
@@ -427,6 +427,7 @@ function getAssetKeysNeedingUpload(
       ...files.map(filePath => path.basename(filePath)),
     ]),
   ];
+  log.info('filepath of keysneedingupload:', all);
   const keyMap = {};
   return all
     .filter(k => !k.includes('.json'))
@@ -497,9 +498,9 @@ async function writeIndices({
             const ind = keys[indexes[0]];
 
             if (onChain.length != indexes.length) {
-              // log.info(
-              //   `Writing indices ${ind}-${keys[indexes[indexes.length - 1]]}`,
-              // );
+              log.info(
+                `Writing indices ${ind}-${keys[indexes[indexes.length - 1]]}`,
+              );
               try {
                 await anchorProgram.rpc.addConfigLines(
                   ind,
@@ -523,12 +524,12 @@ async function writeIndices({
                 });
                 saveCache(cacheName, env, cache);
               } catch (err) {
-                // log.error(
-                //   `Saving config line ${ind}-${
-                //     keys[indexes[indexes.length - 1]]
-                //   } failed`,
-                //   err,
-                // );
+                log.error(
+                  `Saving config line ${ind}-${
+                    keys[indexes[indexes.length - 1]]
+                  } failed`,
+                  err,
+                );
               }
             }
           }
@@ -536,7 +537,7 @@ async function writeIndices({
       ),
     );
   } catch (e) {
-   // log.error(e);
+    log.error(e);
   } finally {
     saveCache(cacheName, env, cache);
   }
@@ -599,17 +600,17 @@ export async function upload({
   // otherwise.
   const cache: Cache | undefined = loadCache(cacheName, env);
   if (cache === undefined) {
-    // log.error(
-    //   'Existing cache not found. To create a new candy machine, please use candy machine v2.',
-    // );
+    log.error(
+      'Existing cache not found. To create a new candy machine, please use candy machine v2.',
+    );
     throw new Error('Existing cache not found');
   }
 
   // Make sure config exists in cache
   if (!cache.program?.config) {
-    // log.error(
-    //   'existing config account not found in cache. To create a new candy machine, please use candy machine v2.',
-    // );
+    log.error(
+      'existing config account not found in cache. To create a new candy machine, please use candy machine v2.',
+    );
     throw new Error('config account not found in cache');
   }
   const config = new PublicKey(cache.program.config);
@@ -665,10 +666,10 @@ export async function upload({
           updatedManifests,
         );
         saveCache(cacheName, env, cache);
-      //  log.info('Saved bundle upload result to cache.');
+       log.info('Saved bundle upload result to cache.');
         result = arweaveBundleUploadGenerator.next();
       }
-    //  log.info('Upload done.');
+     log.info('Upload done.');
     } else {
       // For other storage methods, we upload the files individually.
       const SIZE = dedupedAssetKeys.length;
@@ -693,7 +694,7 @@ export async function upload({
               const manifestBuffer = Buffer.from(JSON.stringify(manifest));
               if (i >= lastPrinted + tick || i === 0) {
                 lastPrinted = i;
-              //  log.info(`Processing asset: ${assetKey}`);
+                log.info(`Processing asset: ${assetKey}`);
               }
 
               let link, imageLink;
@@ -726,7 +727,7 @@ export async function upload({
                     );
                 }
                 if (link && imageLink) {
-             //     log.debug('Updating cache for ', assetKey);
+                  log.debug('Updating cache for ', assetKey);
                   cache.items[assetKey.index] = {
                     link,
                     imageLink,
@@ -736,7 +737,7 @@ export async function upload({
                   saveCache(cacheName, env, cache);
                 }
               } catch (err) {
-              //  log.error(`Error uploading file ${assetKey}`, err);
+               log.error(`Error uploading file ${assetKey}`, err);
                 throw err;
               }
             }

@@ -1,9 +1,8 @@
 import fs from 'fs';
+import log from 'loglevel';
 
 import * as anchor from '@project-serum/anchor';
-//import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { web3 } from '@project-serum/anchor';
-//import log from 'loglevel';
 import {
   AccountLayout,
   u64,
@@ -128,7 +127,8 @@ export type AccountAndPubkey = {
   ) {
     const candyAccount = Keypair.generate();
     candyData.uuid = uuidFromConfigPubkey(candyAccount.publicKey);
-  
+    log.info('candyaccout public key', candyAccount);
+    log.info('candyadata :', candyData);
     if (!candyData.creators || candyData.creators.length === 0) {
       throw new Error(`Invalid config, there must be at least one creator.`);
     }
@@ -150,6 +150,7 @@ export type AccountAndPubkey = {
         isWritable: false,
       });
     }
+    log.info('spltoken : ', splToken);
     return {
       candyMachine: candyAccount.publicKey,
       uuid: candyData.uuid,
@@ -573,7 +574,7 @@ export type AccountAndPubkey = {
     const loaded = Keypair.fromSecretKey(
       new Uint8Array(JSON.parse(fs.readFileSync(keypair).toString())),
     );
-   // log.info(`wallet public key: ${loaded.publicKey}`);
+   log.info(`wallet public key: ${loaded.publicKey}`);
     return loaded;
   }
   
@@ -594,9 +595,10 @@ export type AccountAndPubkey = {
     const provider = new anchor.Provider(solConnection, walletWrapper, {
       preflightCommitment: 'recent',
     });
+
     const idl = await anchor.Program.fetchIdl(CANDY_MACHINE_PROGRAM_ID, provider);
     const program = new anchor.Program(idl, CANDY_MACHINE_PROGRAM_ID, provider);
-  //  log.debug('program id from anchor', program.programId.toBase58());
+   log.debug('program id from anchor', program.programId.toBase58());
     return program;
   }
   
@@ -606,7 +608,7 @@ export type AccountAndPubkey = {
     customRpcUrl?: string,
   ) {
     if (customRpcUrl) console.log('USING CUSTOM URL', customRpcUrl);
-  
+   log.info('env', env);
     // @ts-ignore
     const solConnection = new anchor.web3.Connection(
       //@ts-ignore
@@ -617,16 +619,23 @@ export type AccountAndPubkey = {
     const provider = new anchor.Provider(solConnection, walletWrapper, {
       preflightCommitment: 'recent',
     });
+    
+    //const base = (await PublicKey.findProgramAddress([], CANDY_MACHINE_PROGRAM_V2_ID))[0];
+
+    
     const idl = await anchor.Program.fetchIdl(
       CANDY_MACHINE_PROGRAM_V2_ID,
       provider,
     );
+
+    log.info('idl', idl);
+   
     const program = new anchor.Program(
       idl,
       CANDY_MACHINE_PROGRAM_V2_ID,
       provider,
     );
-  //  log.debug('program id from anchor', program.programId.toBase58());
+   log.info('program id from anchor', program.programId.toBase58());
     return program;
   }
   
@@ -708,12 +717,12 @@ export type AccountAndPubkey = {
           await anchorProgram.provider.connection.getTokenAccountBalance(account);
         amount = token.value.uiAmount * Math.pow(10, token.value.decimals);
       } catch (e) {
-       // log.error(e);
-        // log.info(
-        //   'Account ',
-        //   account.toBase58(),
-        //   'didnt return value. Assuming 0 tokens.',
-        // );
+        log.error(e);
+        log.info(
+         'Account ',
+          account.toBase58(),
+           'didnt return value. Assuming 0 tokens.',
+         );
       }
     } else {
       amount = await anchorProgram.provider.connection.getBalance(account);

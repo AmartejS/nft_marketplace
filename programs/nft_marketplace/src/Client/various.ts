@@ -1,4 +1,5 @@
 import fs from 'fs';
+import log from 'loglevel';
 //import weighted from 'weighted';
 import path from 'path';
 
@@ -94,7 +95,7 @@ export async function getCandyMachineV2Config(
     uuid,
     arweaveJwk,
   } = config;
-
+ log.info('candymanchine config', config)
   let wallet;
   let parsedPrice = price;
 
@@ -108,6 +109,8 @@ export async function getCandyMachineV2Config(
         )
       )[0]
     : null;
+
+    log.info('getAtaforMint', splTokenAccountFigured);
   if (splToken) {
     if (solTreasuryAccount) {
       throw new Error(
@@ -120,6 +123,7 @@ export async function getCandyMachineV2Config(
       );
     }
     const splTokenKey = new web3.PublicKey(splToken);
+    log.info('spl token key', splTokenKey.toBase58());
     const splTokenAccountKey = new web3.PublicKey(splTokenAccountFigured);
     if (!splTokenAccountFigured) {
       throw new Error(
@@ -133,8 +137,9 @@ export async function getCandyMachineV2Config(
       TOKEN_PROGRAM_ID,
       walletKeyPair,
     );
-
+    log.info('token: -> ' ,token);
     const mintInfo = await token.getMintInfo();
+    log.info('get mint info', mintInfo);
     if (!mintInfo.isInitialized) {
       throw new Error(`The specified spl-token is not initialized`);
     }
@@ -142,6 +147,8 @@ export async function getCandyMachineV2Config(
     if (!tokenAccount.isInitialized) {
       throw new Error(`The specified spl-token-account is not initialized`);
     }
+
+    log.info('token account', tokenAccount.address.toBase58());
     if (!tokenAccount.mint.equals(splTokenKey)) {
       throw new Error(
         `The spl-token-account's mint (${tokenAccount.mint.toString()}) does not match specified spl-token ${splTokenKey.toString()}`,

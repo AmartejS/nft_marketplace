@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 import { program } from 'commander';
 import * as fs from 'fs';
-//import log from 'loglevel';
+import log from 'loglevel';
 import { getType } from 'mime';
 import * as path from 'path';
 
@@ -41,7 +41,7 @@ const supportedImageTypes = {
 if (!fs.existsSync(CACHE_PATH)) {
   fs.mkdirSync(CACHE_PATH);
 }
-//log.setLevel(log.levels.INFO);
+log.setLevel(log.levels.INFO);
 programCommand('upload')
   .argument(
     '<directory>',
@@ -85,7 +85,6 @@ programCommand('upload')
       goLiveDate,
       uuid,
     } = await getCandyMachineV2Config(walletKeyPair, anchorProgram, configPath);
-
     if (storage === StorageType.ArweaveSol && env !== 'mainnet-beta') {
       throw new Error(
         'The arweave-sol storage option only works on mainnet. For devnet, please use either arweave, aws or ipfs\n',
@@ -99,9 +98,9 @@ programCommand('upload')
     }
 
     if (storage === StorageType.Arweave) {
-    //   log.warn(
-    //     'WARNING: The "arweave" storage option will be going away soon. Please migrate to arweave-bundle or arweave-sol for mainnet.\n',
-    //   );
+      log.warn(
+        'WARNING: The "arweave" storage option will be going away soon. Please migrate to arweave-bundle or arweave-sol for mainnet.\n',
+      );
     }
 
     if (storage === StorageType.ArweaveBundle && !arweaveJwk) {
@@ -149,7 +148,7 @@ programCommand('upload')
       } else if (it.endsWith(EXTENSION_JSON)) {
         jsonFileCount++;
       } else {
-        //log.warn(`WARNING: Skipping unsupported file type ${it}`);
+        log.warn(`WARNING: Skipping unsupported file type ${it}`);
         return false;
       }
 
@@ -169,10 +168,10 @@ programCommand('upload')
       );
     }
 
-   // log.info(`Beginning the upload for ${elemCount} (img+json) pairs`);
+   log.info(`Beginning the upload for ${elemCount} (img+json) pairs`);
 
     const startMs = Date.now();
-  //  log.info('started at: ' + startMs.toString());
+  log.info('started at: ' + startMs.toString());
     try {
       await uploadV2({
         files: supportedFiles,
@@ -200,14 +199,13 @@ programCommand('upload')
         arweaveJwk,
       });
     } catch (err) {
-     // log.warn('upload was not successful, please re-run.', err);
+     log.warn('upload was not successful, please re-run.', err);
       process.exit(1);
     }
     const endMs = Date.now();
     const timeTaken = new Date(endMs - startMs).toISOString().substr(11, 8);
-    // log.info(
-    //   `ended at: ${new Date(endMs).toISOString()}. time taken: ${timeTaken}`,
-    // );
+    log.info(
+      `ended at: ${new Date(endMs).toISOString()}. time taken: ${timeTaken}`,);
     process.exit(0);
   });
 
@@ -248,7 +246,7 @@ programCommand('verify_upload')
           if (i % 100 == 0) saveCache(cacheName, env, cacheContent);
 
           const key = allIndexesInSlice[i];
-          //log.info('Looking at key ', key);
+          log.info('Looking at key ', key);
 
           const thisSlice = candyMachine.data.slice(
             CONFIG_ARRAY_START_V2 + 4 + CONFIG_LINE_SIZE_V2 * key,
@@ -288,11 +286,11 @@ programCommand('verify_upload')
       'le',
     );
 
-    // log.info(
-    //   `uploaded (${lineCount.toNumber()}) out of (${
-    //     candyMachineObj.data.itemsAvailable
-    //   })`,
-    // );
+    log.info(
+      `uploaded (${lineCount.toNumber()}) out of (${
+        candyMachineObj.data.itemsAvailable
+      })`,
+    );
     if (candyMachineObj.data.itemsAvailable > lineCount.toNumber()) {
       throw new Error(
         `predefined number of NFTs (${
@@ -300,7 +298,7 @@ programCommand('verify_upload')
         }) is smaller than the uploaded one (${lineCount.toNumber()})`,
       );
     } else {
-      //log.info('ready to deploy!');
+      log.info('ready to deploy!');
     }
 
     saveCache(cacheName, env, cacheContent);
@@ -317,9 +315,10 @@ programCommand('mint_one_token')
 
     const cacheContent = loadCache(cacheName, env);
     const candyMachine = new PublicKey(cacheContent.program.candyMachine);
+    log.info('candymachin pubkey', candyMachine.toBase58());
     const tx = await mintV2(keypair, env, candyMachine, rpcUrl);
 
-    //log.info('mint_one_token finished', tx);
+    log.info('mint_one_token finished', tx);
   });
 
 programCommand('mint_multiple_tokens')
@@ -335,22 +334,22 @@ programCommand('mint_multiple_tokens')
     const cacheContent = loadCache(cacheName, env);
     const candyMachine = new PublicKey(cacheContent.program.candyMachine);
 
-    //log.info(`Minting ${NUMBER_OF_NFTS_TO_MINT} tokens...`);
+    log.info(`Minting ${NUMBER_OF_NFTS_TO_MINT} tokens...`);
 
     const mintToken = async index => {
       const tx = await mintV2(keypair, env, candyMachine, rpcUrl);
-    //  log.info(`transaction ${index + 1} complete`, tx);
+    log.info(`transaction ${index + 1} complete`, tx);
 
       if (index < NUMBER_OF_NFTS_TO_MINT - 1) {
-       // log.info('minting another token...');
+       log.info('minting another token...');
         await mintToken(index + 1);
       }
     };
 
     await mintToken(0);
 
-  // log.info(`minted ${NUMBER_OF_NFTS_TO_MINT} tokens`);
-   // log.info('mint_multiple_tokens finished');
+  log.info(`minted ${NUMBER_OF_NFTS_TO_MINT} tokens`);
+   log.info('mint_multiple_tokens finished');
   });
 
 
@@ -375,8 +374,8 @@ function setLogLevel(value, prev) {
   if (value === undefined || value === null) {
     return;
   }
- // log.info('setting the log value to: ' + value);
- // log.setLevel(value);
+ log.info('setting the log value to: ' + value);
+ log.setLevel(value);
 }
 
 program.parse(process.argv);
