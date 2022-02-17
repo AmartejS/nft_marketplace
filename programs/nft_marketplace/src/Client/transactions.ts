@@ -36,14 +36,15 @@ interface BlockhashAndFeeCalculator {
     beforeSend?: () => void,
   ) => {
     const transaction = new Transaction();
-    instructions.forEach(  instruction2=>  log.info('Instructions :', instruction2.data)
-    );
-    log.info('Instructions :', instructions);
+    // instructions.forEach(  instruction2=> 
+    //    log.info('Instructions :', instruction2.data)
+    // );
+    // log.info('Instructions :', instructions);
     instructions.forEach(instruction => transaction.add(instruction));
     transaction.recentBlockhash = (
       block || (await connection.getRecentBlockhash(commitment))
     ).blockhash;
-  log.info('transaction recentBlockhash: ', transaction);
+  // log.info('transaction recentBlockhash: ', transaction);
     if (includesFeePayer) {
       transaction.setSigners(...signers.map(s => s.publicKey));
     } else {
@@ -63,7 +64,7 @@ interface BlockhashAndFeeCalculator {
     if (beforeSend) {
       beforeSend();
     }
-  log.info('sending signedTransaction', transaction);
+  // log.info('sending signedTransaction', transaction);
     const { txid, slot } = await sendSignedTransaction({
       connection,
       signedTransaction: transaction,
@@ -71,7 +72,7 @@ interface BlockhashAndFeeCalculator {
   
     return { txid, slot };
   };
- log.info('sending second signedTransaction')
+//  log.info('sending second signedTransaction')
   export async function sendSignedTransaction({
     signedTransaction,
     connection,

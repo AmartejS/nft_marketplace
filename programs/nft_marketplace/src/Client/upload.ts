@@ -31,6 +31,48 @@ import { StorageType } from './storagetype';
 import { AssetKey } from './types';
 import { chunks } from './various';
 
+
+interface IArweaveResult {
+  error?: string;
+  messages?: Array<{
+    filename: string;
+    status: 'success' | 'fail';
+    transactionId?: string;
+    error?: string;
+  }>;
+}
+
+export const ARWEAVE_UPLOAD_ENDPOINT =
+'https://us-central1-metaplex-studios.cloudfunctions.net/uploadFile';
+export async function uploadV1(){
+const uploadToArweave = async (data: FormData): Promise<IArweaveResult> => {
+  const resp = await fetch(
+    ARWEAVE_UPLOAD_ENDPOINT,
+    {
+      method: 'POST',
+      // @ts-ignore
+      body: data,
+    },
+  );
+
+  if (!resp.ok) {
+    return Promise.reject(
+      new Error(
+        'Unable to upload the artwork to Arweave. Please wait and then try again.',
+      ),
+    );
+  }
+
+  const result: IArweaveResult = await resp.json();
+
+  if (result.error) {
+    return Promise.reject(new Error(result.error));
+  }
+
+  return result;
+}
+};
+
 export async function uploadV2({
   files,
   cacheName,
@@ -95,7 +137,7 @@ export async function uploadV2({
   let uploadSuccessful = true;
   const savedContent = loadCache(cacheName, env);
   const cacheContent = savedContent || {};
- log.info('saved content', savedContent);
+//  log.info('saved content', savedContent);
   if (!cacheContent.program) {
     cacheContent.program = {};
   }
@@ -111,7 +153,7 @@ export async function uploadV2({
   let candyMachine = cacheContent.program.candyMachine
     ? new PublicKey(cacheContent.program.candyMachine)
     : undefined;
-log.info('dirmame :', dirname);
+// log.info('dirmame :', dirname);
   if (!cacheContent.program.uuid) {
     const firstAssetManifest = getAssetManifest(dirname, '0.json');
 
@@ -137,7 +179,7 @@ log.info('dirmame :', dirname);
       }
 
       // initialize candy
-     log.info(`initializing candy machine`);
+    //  log.info(`initializing candy machine`);
       const res = await createCandyMachineV2(
         anchorProgram,
         walletKeyPair,
@@ -171,7 +213,7 @@ log.info('dirmame :', dirname);
       candyMachine = res.candyMachine;
 
      log.info(
-         `initialized config for a candy machine with publickey: ${res.candyMachine.toBase58()}`,
+        //  `initialized config for a candy machine with publickey: ${res.candyMachine.toBase58()}`,
        );
 
       saveCache(cacheName, env, cacheContent);
@@ -180,9 +222,9 @@ log.info('dirmame :', dirname);
       throw exx;
     }
   } else {
-    log.info(
-      `config for a candy machine with publickey: ${cacheContent.program.candyMachine} has been already initialized`,
-    );
+    // log.info(
+    //   `config for a candy machine with publickey: ${cacheContent.program.candyMachine} has been already initialized`,
+    // );
   }
 
   log.info('Uploading Size', SIZE, dedupedAssetKeys[0]);
@@ -217,7 +259,7 @@ log.info('dirmame :', dirname);
           updatedManifests,
         );
         saveCache(cacheName, env, cacheContent);
-       log.info('Saved bundle upload result to cache.');
+      //  log.info('Saved bundle upload result to cache.');
         result = arweaveBundleUploadGenerator.next();
       }
      log.info('Upload done.');
@@ -373,7 +415,7 @@ log.info('dirmame :', dirname);
       saveCache(cacheName, env, cacheContent);
     }
   } else {
-    log.info('Skipping upload to chain as this is a hidden Candy Machine');
+    // log.info('Skipping upload to chain as this is a hidden Candy Machine');
   }
 
   console.log(`Done. Successful = ${uploadSuccessful}.`);
@@ -427,7 +469,7 @@ function getAssetKeysNeedingUpload(
       ...files.map(filePath => path.basename(filePath)),
     ]),
   ];
-  log.info('filepath of keysneedingupload:', all);
+  // log.info('filepath of keysneedingupload:', all);
   const keyMap = {};
   return all
     .filter(k => !k.includes('.json'))
@@ -666,7 +708,7 @@ export async function upload({
           updatedManifests,
         );
         saveCache(cacheName, env, cache);
-       log.info('Saved bundle upload result to cache.');
+      //  log.info('Saved bundle upload result to cache.');
         result = arweaveBundleUploadGenerator.next();
       }
      log.info('Upload done.');

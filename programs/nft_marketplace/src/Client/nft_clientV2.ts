@@ -85,30 +85,32 @@ programCommand('upload')
       goLiveDate,
       uuid,
     } = await getCandyMachineV2Config(walletKeyPair, anchorProgram, configPath);
-    log.info('getCandy MachineV2Config ------------------ :-');
+  //   log.info('getCandy MachineV2Config ------------------ :-');
 
-    log.info('storage: ',storage);
-    log.info('nftstorage: ', nftStorageKey);
-    log.info('ipfs projectid: ',ipfsInfuraProjectId);
-    log.info('number: ',number);
-   // log.info(ipfsInfuraSecret);
-    log.info('arweave jwk: ', arweaveJwk);
-    log.info('awsS3Bucket: ', awsS3Bucket );
-    log.info('retainAuthority: ',retainAuthority);
-    log.info('mutable: ', mutable);
-    log.info('batchsize: ', batchSize);
-    log.info('price: ', price);
-    log.info('spltoken: ',splToken);
-    log.info('treasurywallet: ', treasuryWallet.toBase58());
-    log.info('gatekeeper: ',gatekeeper);
-    log.info('endsettings: ',endSettings);
-    log.info('hiddensettings: ',hiddenSettings);
-    log.info('whitelistmintsettings: ', whitelistMintSettings);
-    log.info('goLiveDate: ',goLiveDate);
-    log.info('uuid: ',uuid);
+  //   log.info('storage: ',storage);
+  //   log.info('nftstorage: ', nftStorageKey);
+  //   log.info('ipfs projectid: ',ipfsInfuraProjectId);
+  //   log.info('number: ',number);
+  //  // log.info(ipfsInfuraSecret);
+  //   log.info('arweave jwk: ', arweaveJwk);
+  //   log.info('awsS3Bucket: ', awsS3Bucket );
+  //   log.info('retainAuthority: ',retainAuthority);
+  //   log.info('mutable: ', mutable);
+  //   log.info('batchsize: ', batchSize);
+  //   log.info('price: ', price);
+  //   log.info('spltoken: ',splToken);
+  //   log.info('treasurywallet: ', treasuryWallet.toBase58());
+  //   log.info('gatekeeper: ',gatekeeper);
+  //   log.info('endsettings: ',endSettings);
+  //   log.info('hiddensettings: ',hiddenSettings);
+  //   log.info('whitelistmintsettings: ', whitelistMintSettings);
+  //   log.info('goLiveDate: ',goLiveDate);
+  //   log.info('uuid: ',uuid);
     if (storage === StorageType.ArweaveSol && env !== 'mainnet-beta') {
       throw new Error(
-        'The arweave-sol storage option only works on mainnet. For devnet, please use either arweave, aws or ipfs\n',
+        // 'The arweave-sol storage option only works on mainnet. For devnet, please use either arweave, aws or ipfs\n',
+
+       'Using arweave storage option to upload metadata.'
       );
     }
 
@@ -120,7 +122,7 @@ programCommand('upload')
 
     if (storage === StorageType.Arweave) {
       log.warn(
-        'WARNING: The "arweave" storage option will be going away soon. Please migrate to arweave-bundle or arweave-sol for mainnet.\n',
+        // 'WARNING: The "arweave" storage option will be going away soon. Please migrate to arweave-bundle or arweave-sol for mainnet.\n',
       );
     }
 
@@ -223,6 +225,8 @@ programCommand('upload')
      log.warn('upload was not successful, please re-run.', err);
       process.exit(1);
     }
+
+    
     const endMs = Date.now();
     const timeTaken = new Date(endMs - startMs).toISOString().substr(11, 8);
     log.info(
@@ -336,7 +340,7 @@ programCommand('mint_one_token')
 
     const cacheContent = loadCache(cacheName, env);
     const candyMachine = new PublicKey(cacheContent.program.candyMachine);
-    log.info('candymachin pubkey', candyMachine.toBase58());
+    // log.info('candymachin pubkey', candyMachine.toBase58());
     const tx = await mintV2(keypair, env, candyMachine, rpcUrl);
 
     log.info('mint_one_token finished', tx);

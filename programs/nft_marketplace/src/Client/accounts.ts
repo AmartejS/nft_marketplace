@@ -127,8 +127,8 @@ export type AccountAndPubkey = {
   ) {
     const candyAccount = Keypair.generate();
     candyData.uuid = uuidFromConfigPubkey(candyAccount.publicKey);
-    log.info('candyaccout public key', candyAccount);
-    log.info('candyadata :', candyData);
+    // log.info('candyaccout public key', candyAccount);
+    // log.info('candyadata :', candyData);
     if (!candyData.creators || candyData.creators.length === 0) {
       throw new Error(`Invalid config, there must be at least one creator.`);
     }
@@ -150,7 +150,7 @@ export type AccountAndPubkey = {
         isWritable: false,
       });
     }
-    log.info('spltoken : ', splToken);
+    // log.info('spltoken : ', splToken);
     return {
       candyMachine: candyAccount.publicKey,
       uuid: candyData.uuid,
@@ -608,7 +608,7 @@ export type AccountAndPubkey = {
     customRpcUrl?: string,
   ) {
     if (customRpcUrl) console.log('USING CUSTOM URL', customRpcUrl);
-   log.info('env', env);
+  //  log.info('env', env);
     // @ts-ignore
     const solConnection = new anchor.web3.Connection(
       //@ts-ignore
@@ -628,7 +628,7 @@ export type AccountAndPubkey = {
       provider,
     );
 
-    log.info('idl', idl);
+   // log.info('idl', idl);
    
     const program = new anchor.Program(
       idl,

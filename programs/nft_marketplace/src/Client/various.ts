@@ -95,7 +95,7 @@ export async function getCandyMachineV2Config(
     uuid,
     arweaveJwk,
   } = config;
- log.info('candymanchine config', config)
+//  log.info('candymanchine config', config)
   let wallet;
   let parsedPrice = price;
 
@@ -110,7 +110,7 @@ export async function getCandyMachineV2Config(
       )[0]
     : null;
 
-    log.info('getAtaforMint', splTokenAccountFigured);
+    // log.info('getAtaforMint', splTokenAccountFigured);
   if (splToken) {
     if (solTreasuryAccount) {
       throw new Error(
@@ -139,7 +139,7 @@ export async function getCandyMachineV2Config(
     );
     log.info('token: -> ' ,token);
     const mintInfo = await token.getMintInfo();
-    log.info('get mint info', mintInfo);
+    // log.info('get mint info', mintInfo);
     if (!mintInfo.isInitialized) {
       throw new Error(`The specified spl-token is not initialized`);
     }

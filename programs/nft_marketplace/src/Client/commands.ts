@@ -41,12 +41,12 @@ export async function mintV2(
     userKeyPair.publicKey,
     mint.publicKey,
   );
-  log.info('mint :', mint.publicKey.toBase58());
+  log.info('token id :', mint.publicKey.toBase58());
   log.info('usertokenAccountAddress: ', userTokenAccountAddress.toBase58());
   const candyMachine: any = await anchorProgram.account.candyMachine.fetch(
     candyMachineAddress,
   );
-log.info('candyMachine: ', candyMachine);
+// log.info('candyMachine: ', candyMachine);
   const remainingAccounts = [];
   const signers = [mint, userKeyPair];
   const cleanupInstructions = [];
@@ -185,38 +185,38 @@ log.info('candyMachine: ', candyMachine);
     candyMachineAddress,
   );
 
-  log.info('candy machine creator', candyMachineCreator.toBase58());
-  log.info('creator bump', creatorBump);
-  let mintnftinst = await anchorProgram.instruction.mintNft(creatorBump, {
-    accounts: {
-      candyMachine: candyMachineAddress,
-      candyMachineCreator,
-      payer: userKeyPair.publicKey,
-      //@ts-ignore
-      wallet: candyMachine.wallet,
-      mint: mint.publicKey,
-      metadata: metadataAddress,
-      masterEdition,
-      mintAuthority: userKeyPair.publicKey,
-      updateAuthority: userKeyPair.publicKey,
-      tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-      tokenProgram: TOKEN_PROGRAM_ID,
-      systemProgram: SystemProgram.programId,
-      rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-      clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
-      recentBlockhashes: anchor.web3.SYSVAR_RECENT_BLOCKHASHES_PUBKEY,
-      instructionSysvarAccount: anchor.web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-    },
-    remainingAccounts:
-      remainingAccounts.length > 0 ? remainingAccounts : undefined,
-  })
+  // log.info('candy machine creator', candyMachineCreator.toBase58());
+  // log.info('creator bump', creatorBump);
+  // let mintnftinst = await anchorProgram.instruction.mintNft(creatorBump, {
+  //   accounts: {
+  //     candyMachine: candyMachineAddress,
+  //     candyMachineCreator,
+  //     payer: userKeyPair.publicKey,
+  //     //@ts-ignore
+  //     wallet: candyMachine.wallet,
+  //     mint: mint.publicKey,
+  //     metadata: metadataAddress,
+  //     masterEdition,
+  //     mintAuthority: userKeyPair.publicKey,
+  //     updateAuthority: userKeyPair.publicKey,
+  //     tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+  //     tokenProgram: TOKEN_PROGRAM_ID,
+  //     systemProgram: SystemProgram.programId,
+  //     rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+  //     clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
+  //     recentBlockhashes: anchor.web3.SYSVAR_RECENT_BLOCKHASHES_PUBKEY,
+  //     instructionSysvarAccount: anchor.web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+  //   },
+  //   remainingAccounts:
+  //     remainingAccounts.length > 0 ? remainingAccounts : undefined,
+  // })
 
-  log.info('mint token id', mint.publicKey.toBase58());
+  // log.info('mint token id', mint.publicKey.toBase58());
 
-  log.info("mintnftinstruction: ", mintnftinst.programId.toBase58());
+  //log.info("mintnftinstruction: ", mintnftinst.programId.toBase58());
     
-  instructions.push(mintnftinst);
-log.info('mintnft instructions pushed ', instructions);
+  //instructions.push(mintnftinst);
+// log.info('mintnft instructions pushed ', instructions);
   const finished = (
     await sendTransactionWithRetryWithKeypair(
       anchorProgram.provider.connection,
@@ -227,14 +227,14 @@ log.info('mintnft instructions pushed ', instructions);
   ).txid;
   log.info('finished', finished.toString());
 
-log.info('first sendTransactionWithRetryKepair');
+// log.info('first sendTransactionWithRetryKepair');
   await sendTransactionWithRetryWithKeypair(
     anchorProgram.provider.connection,
     userKeyPair,
     cleanupInstructions,
     [],
   );
-  log.info('second sendTransactoinWithRetryKeypair');
+  // log.info('second sendTransactoinWithRetryKeypair');
 
   return finished;
 }
